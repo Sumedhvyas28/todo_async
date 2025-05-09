@@ -57,8 +57,9 @@ Build a todo_async app where tasks can be queued and uploaded to Firebase asynch
    - On failure: retries up to 3 times.
 
 ---
-
 ## 🧱 Folder Structure
+
+```plaintext
 
 lib/
 │
@@ -89,5 +90,3 @@ lib/
 ├── app_router.dart           # GoRouter setup
 ├── firebase_options.dart     # Firebase config
 └── main.dart                 # App entry point
-
-
