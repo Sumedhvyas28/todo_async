@@ -7,26 +7,34 @@ import 'auth_repository.dart';
 class TaskRepository {
   final FirebaseFirestore _firestore;
   final AuthRepository _authRepository;
-  final AsyncTaskQueue _taskQueue;
+  late final AsyncTaskQueue _taskQueue;
   final uuid = const Uuid();
+  final List<Task> _localQueuedTasks = [];
+
+  List<Task> get localQueuedTasks => List.unmodifiable(_localQueuedTasks);
+  void addLocalQueuedTask(Task task) => _localQueuedTasks.add(task);
+  void removeLocalQueuedTask(String id) =>
+      _localQueuedTasks.removeWhere((t) => t.id == id);
 
   TaskRepository({
     FirebaseFirestore? firestore,
     required AuthRepository authRepository,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _authRepository = authRepository,
-        _taskQueue = AsyncTaskQueue(
-          processCallback: (task) async =>
-              await (firestore ?? FirebaseFirestore.instance)
-                  .collection('users')
-                  .doc(authRepository.currentUser?.uid)
-                  .collection('tasks')
-                  .doc(task.id)
-                  .set(task.copyWith(status: TaskStatus.uploaded).toMap()),
-          onErrorCallback: (task, error) =>
-              print('Error processing task: $error'),
-          onSuccessCallback: (task) => print('Task uploaded: ${task.id}'),
-        );
+        _authRepository = authRepository {
+    _taskQueue = AsyncTaskQueue(
+      processCallback: (task) async => await _firestore
+          .collection('users')
+          .doc(_authRepository.currentUser?.uid)
+          .collection('tasks')
+          .doc(task.id)
+          .set(task.copyWith(status: TaskStatus.uploaded).toMap()),
+      onErrorCallback: (task, error) => print('Error processing task: $error'),
+      onSuccessCallback: (task) {
+        print('Task uploaded: ${task.id}');
+        removeLocalQueuedTask(task.id); // ✅ This works now!
+      },
+    );
+  }
 
   // Create a new task and add it to the queue
   Future<Task> createTask({
@@ -50,7 +58,7 @@ class TaskRepository {
 
     // Add task to the queue
     _taskQueue.enqueue(task);
-
+    addLocalQueuedTask(task);
     // Return the task
     return task;
   }

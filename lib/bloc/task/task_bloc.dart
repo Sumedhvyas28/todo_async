@@ -58,7 +58,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     TasksStreamUpdated event,
     Emitter<TaskState> emit,
   ) {
-    emit(state.copyWith(status: TaskStatus.uploaded, tasks: event.tasks));
+    final combinedTasks = [
+      ..._taskRepository.localQueuedTasks,
+      ...event.tasks,
+    ];
+    emit(state.copyWith(status: TaskStatus.uploaded, tasks: combinedTasks));
   }
 
   @override
