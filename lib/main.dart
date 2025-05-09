@@ -25,36 +25,36 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: authRepository),
+        RepositoryProvider(
+          create: (context) => TaskRepository(authRepository: authRepository),
+        ),
+      ],
+      child: MultiBlocProvider(
         providers: [
-          RepositoryProvider.value(value: authRepository),
-          RepositoryProvider(
-            create: (context) => TaskRepository(authRepository: authRepository),
+          BlocProvider(
+              create: (context) =>
+                  AuthBloc(authRepository: context.read<AuthRepository>())),
+          BlocProvider(
+            create: (context) =>
+                TaskBloc(taskRepository: context.read<TaskRepository>()),
           ),
         ],
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider(
-                create: (context) =>
-                    AuthBloc(authRepository: context.read<AuthRepository>())),
-            BlocProvider(
-              create: (context) =>
-                  TaskBloc(taskRepository: context.read<TaskRepository>()),
-            ),
-          ],
-          child: Builder(
-            builder: (context) {
-              final appRouter = AppRouter(authBloc: context.read<AuthBloc>());
-              return MaterialApp.router(
-                routerConfig: appRouter.router,
-                debugShowCheckedModeBanner: false,
-                title: 'Flutter Demo',
-                theme: ThemeData(
-                  colorScheme:
-                      ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-                ),
-              );
-            },
-          ),
-        ));
+        child: Builder(
+          builder: (context) {
+            final appRouter = AppRouter(authBloc: context.read<AuthBloc>());
+            return MaterialApp.router(
+              routerConfig: appRouter.router,
+              debugShowCheckedModeBanner: false,
+              title: 'Flutter Demo',
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

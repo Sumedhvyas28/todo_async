@@ -34,7 +34,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
           );
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Task added to queue'),
@@ -42,7 +41,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         ),
       );
 
-      // Navigate back to dashboard
       context.go('/dashboard');
     }
   }

@@ -4,6 +4,8 @@ import 'package:uuid/uuid.dart';
 import '../models/task_model.dart';
 import 'auth_repository.dart';
 
+// for mostly task creation and memory both local and firebase
+
 class TaskRepository {
   final FirebaseFirestore _firestore;
   final AuthRepository _authRepository;
@@ -31,23 +33,21 @@ class TaskRepository {
       onErrorCallback: (task, error) => print('Error processing task: $error'),
       onSuccessCallback: (task) {
         print('Task uploaded: ${task.id}');
-        removeLocalQueuedTask(task.id); // ✅ This works now!
+        removeLocalQueuedTask(task.id);
       },
     );
   }
 
-  // Create a new task and add it to the queue
+// Create a new Task object with a unique ID and 'queued' status
   Future<Task> createTask({
     required String title,
     required String description,
   }) async {
-    // Ensure user is logged in
     final user = _authRepository.currentUser;
     if (user == null) {
       throw Exception('User not authenticated');
     }
 
-    // Create new task with queued status
     final task = Task(
       id: uuid.v4(),
       title: title,
@@ -56,14 +56,12 @@ class TaskRepository {
       status: TaskStatus.queued,
     );
 
-    // Add task to the queue
     _taskQueue.enqueue(task);
+    // Save the task locally in memory to show immediately in the UI
     addLocalQueuedTask(task);
-    // Return the task
     return task;
   }
 
-  // Get stream of tasks for current user
   Stream<List<Task>> getTasks() {
     final user = _authRepository.currentUser;
     if (user == null) {

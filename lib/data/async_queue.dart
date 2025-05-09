@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 import '../models/task_model.dart';
 
-// Custom async queue implementation
 class AsyncTaskQueue {
   final Queue<Task> _queue = Queue<Task>();
   final int _processingDelay;
@@ -16,7 +15,7 @@ class AsyncTaskQueue {
     required Function(Task) processCallback,
     required Function(Task, dynamic) onErrorCallback,
     required Function(Task) onSuccessCallback,
-    int processingDelay = 5, // seconds
+    int processingDelay = 5,
     int maxRetries = 3,
   })  : _processCallback = processCallback,
         _onErrorCallback = onErrorCallback,
@@ -41,27 +40,21 @@ class AsyncTaskQueue {
     final task = _queue.removeFirst();
 
     try {
-      // Add delay to simulate processing time
       await Future.delayed(Duration(seconds: _processingDelay));
 
-      // Process the task
       _processCallback(task);
 
-      // Notify success
       _onSuccessCallback(task);
     } catch (error) {
-      // If retry count hasn't exceeded max, re-enqueue with incremented retry count
       if (task.retryCount < _maxRetries) {
         final retryTask = task.copyWith(retryCount: task.retryCount + 1);
         _queue.add(retryTask);
         _onErrorCallback(task, error);
       } else {
-        // Max retries exceeded, notify error handler
         _onErrorCallback(task, 'Max retries exceeded: $error');
       }
     }
 
-    // Continue processing the queue
     _processQueue();
   }
 
@@ -69,7 +62,6 @@ class AsyncTaskQueue {
 
   int get length => _queue.length;
 
-  // Clear the queue
   void clear() {
     _queue.clear();
     _isProcessing = false;

@@ -20,12 +20,10 @@ class AppRouter {
       final isAuthenticated = authBloc.state.status == AuthStatus.authenticated;
       final isLoginRoute = state.uri.toString() == '/login';
 
-      // If user is not authenticated and not on login route, redirect to login
       if (!isAuthenticated && !isLoginRoute) {
         return '/login';
       }
 
-      // If user is authenticated and on login route, redirect to dashboard
       if (isAuthenticated && isLoginRoute) {
         return '/dashboard';
       }
@@ -46,7 +44,6 @@ class AppRouter {
   );
 }
 
-// Helper class to make Bloc's state stream usable with GoRouter
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;
 

@@ -21,7 +21,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch tasks when screen initializes
     context.read<TaskBloc>().add(TasksFetched());
   }
 
@@ -44,7 +43,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       body: Column(
         children: [
-          // User email display
           Container(
             padding: const EdgeInsets.all(16.0),
             color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -59,7 +57,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
           ),
-          // Tasks list
           Expanded(
             child: BlocBuilder<TaskBloc, TaskState>(
               builder: (context, state) {
