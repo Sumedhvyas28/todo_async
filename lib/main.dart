@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/app_router.dart';
 import 'package:todo_app/bloc/auth/auth_bloc.dart';
+import 'package:todo_app/bloc/task/task_bloc.dart';
 import 'package:todo_app/data/auth_repository.dart';
 import 'package:todo_app/data/task_repository.dart';
 import 'package:todo_app/firebase_options.dart';
@@ -34,7 +35,11 @@ class MyApp extends StatelessWidget {
           providers: [
             BlocProvider(
                 create: (context) =>
-                    AuthBloc(authRepository: context.read<AuthRepository>()))
+                    AuthBloc(authRepository: context.read<AuthRepository>())),
+            BlocProvider(
+              create: (context) =>
+                  TaskBloc(taskRepository: context.read<TaskRepository>()),
+            ),
           ],
           child: Builder(
             builder: (context) {
